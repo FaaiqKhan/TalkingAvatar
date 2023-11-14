@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Talking Avatar</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="content_base_path">content_base_path</string>
+    <string name="unable_to_fetch_presenter">Unable to fetch presenter</string>
+    <string name="unable_to_create_presenter">Unable to create presenter</string>
+</resources>
