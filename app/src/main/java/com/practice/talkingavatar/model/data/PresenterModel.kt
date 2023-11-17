@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 data class PresenterModel(
     val id: String?,
     val status: String?,
-    val config: Config?,
+    val config: PresenterConfigModel?,
     @Json(name = "user_id")
     val userId: String?,
     @Json(name = "result_url")
@@ -18,11 +18,4 @@ data class PresenterModel(
     val driverUrl: String?,
     val filePath: String? = null,
     val image: PresenterImage? = null,
-)
-
-@JsonClass(generateAdapter = true)
-data class Config(
-    val mute: Boolean?,
-    @Json(name = "result_format")
-    val resultFormat: String?,
 )
