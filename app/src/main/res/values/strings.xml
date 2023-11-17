@@ -4,4 +4,8 @@
     <string name="content_base_path">content_base_path</string>
     <string name="unable_to_fetch_presenter">Unable to fetch presenter</string>
     <string name="unable_to_create_presenter">Unable to create presenter</string>
+    <string name="let_s_create_your_avatar_today">Let\'s create your avatar today!</string>
+    <string name="get_started">Get started</string>
+    <string name="upload">Upload</string>
+    <string name="let_s_take_snap">Let\'s take snap!</string>
 </resources>

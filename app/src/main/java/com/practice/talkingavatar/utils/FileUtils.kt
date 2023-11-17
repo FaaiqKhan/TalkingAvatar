@@ -1,42 +1,37 @@
 package com.practice.talkingavatar.utils
 
 import android.content.Context
+import android.net.Uri
 import android.os.Environment
+import androidx.core.content.FileProvider
 import com.practice.talkingavatar.model.data.PresenterModel
 import java.io.*
 import java.net.URL
 import java.nio.file.Path
+import java.nio.file.Paths
+import java.util.Objects
 import java.util.UUID
 
 object FileUtils {
 
-    private const val imagePath: String = "/files/images"
-    private const val animationPath: String = "/files/animations"
-//
-//    fun createImageFolderIfNotExist() {
-//        val imageFile = File(imagePath)
-//        if (!imageFile.exists()) imageFile.mkdir()
-//    }
-//
-//    fun createLoggerFolderIfNotExit(context: Context) {
-//        val loggerFolderFile =
-//            File(Environment.DIRECTORY_DOCUMENTS + "/${Utils.getApplicationName(context)}")
-//        if (!loggerFolderFile.exists()) loggerFolderFile.mkdir()
-//    }
+    fun getFileUri(context: Context): Uri = FileProvider.getUriForFile(
+        Objects.requireNonNull(context),
+        context.packageName + ".provider",
+        context.createImageFile(),
+    )
+
+    fun getFileFromUri(uri: Uri, context: Context): File {
+        return Paths.get(context.dataDir.path + uri.path).toFile()
+    }
 
     fun downloadAnimationFromUrl(
         context: Context,
         url: String,
         fileName: String,
-        format: String? = ".mp4",
     ): String? {
-        val animationFile = File(context.dataDir.path + animationPath)
-        if (!animationFile.exists())
-            animationFile.mkdir()
-
         try {
-            val animationFileName = "$fileName$format"
-            val downloadAnimationFile = File(animationFile, animationFileName)
+            val animationFile = context.createAnimationFile(fileName)
+            val downloadAnimationFile = File(animationFile, animationFile.name)
 
             val inputStream = URL(url).openStream()
             val outputStream = FileOutputStream(downloadAnimationFile)

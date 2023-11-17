@@ -10,6 +10,7 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import arrow.core.Either
 import com.practice.talkingavatar.R
+import com.practice.talkingavatar.model.data.PresenterImage
 import com.practice.talkingavatar.model.data.PresenterModel
 import com.practice.talkingavatar.model.repository.DidServiceRepository
 import com.practice.talkingavatar.model.repository.S3Repository
@@ -19,10 +20,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
-class TalkingAvatarViewModel @Inject constructor(
+class HomeScreenViewModel @Inject constructor(
     private val s3Repository: S3Repository,
     private val repository: DidServiceRepository,
     val exoPlayer: ExoPlayer,
@@ -77,8 +81,16 @@ class TalkingAvatarViewModel @Inject constructor(
         viewModelScope.launch(dispatcher + exceptionHandler) {
             _screenState.emit(HomeScreenUiState.Loading)
 
-            val imageFile = Utils.getFileFromUri(imageUri, context)
-            val imagePreSignedUrl = s3Repository.generatePreSignedUrlAndUploadImage(imageFile)
+            val imageFile = FileUtils.getFileFromUri(imageUri, context)
+
+            val expirationTime: LocalDateTime = LocalDate.now()
+                .plusDays(7)
+                .atStartOfDay()
+
+            val imagePreSignedUrl = s3Repository.generatePreSignedUrlAndUploadImage(
+                imageFile,
+                expirationTime.toInstant(ZoneOffset.UTC)
+            )
 
             val presenterReference = repository.generatePresenter(imagePreSignedUrl).run {
                 if (this.isLeft()) {
@@ -133,11 +145,19 @@ class TalkingAvatarViewModel @Inject constructor(
                 context = context,
                 fileName = imageFile.nameWithoutExtension,
                 url = presenter!!.resultUrl!!,
-                format = presenter?.config?.resultFormat
             ) ?: return@launch
 
-            _screenState.emit(HomeScreenUiState.Success(HomeScreenUiModel(animationPath)))
+            presenter = presenter?.copy(
+                filePath = animationPath,
+                image = PresenterImage(
+                    id = imageFile.name,
+                    url = imagePreSignedUrl,
+                    expiry = expirationTime,
+                    filePath = imageFile.path
+                ),
+            )
 
+            _screenState.emit(HomeScreenUiState.Success(HomeScreenUiModel(animationPath)))
         }
     }
 }

@@ -6,70 +6,76 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.practice.talkingavatar.ui.theme.TalkingAvatarTheme
+import com.practice.talkingavatar.utils.FileUtils
 
 @Composable
-fun CameraButtonView(imageUri: Uri, onClick: (imageUri: Uri) -> Unit) {
+fun CameraButton(modifier: Modifier = Modifier, onClick: (imageUri: Uri) -> Unit) {
     val context = LocalContext.current
+    var imageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {
-        if (it) onClick(imageUri)
+        if (it && imageUri != Uri.EMPTY) {
+            onClick(imageUri)
+        }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) {
         if (it) {
+            imageUri = FileUtils.getFileUri(context = context)
             cameraLauncher.launch(imageUri)
         } else {
             Toast.makeText(context, "Permission Denied", Toast.LENGTH_SHORT).show()
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = "Let's take snap!",
-            style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.onPrimary,
-        )
-        Spacer(modifier = Modifier.height(28.dp))
-        Card(
-            shape = RoundedCornerShape(percent = 100),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onBackground
+    Card(
+        modifier = modifier.clickable {
+            val permissionCheckResult = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
             )
-        ) {
-            IconButton(modifier = Modifier.padding(all = 18.dp), onClick = {
-                val permissionCheckResult = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CAMERA
-                )
-                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
-                    cameraLauncher.launch(imageUri)
-                } else {
-                    permissionLauncher.launch(Manifest.permission.CAMERA)
-                }
-            }) {
-                Icon(
-                    painterResource(id = com.practice.talkingavatar.R.drawable.ic_camera),
-                    contentDescription = "Camera",
-                    modifier = Modifier.size(64.dp)
-                )
+            if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                imageUri = FileUtils.getFileUri(context = context)
+                cameraLauncher.launch(imageUri)
+            } else {
+                permissionLauncher.launch(Manifest.permission.CAMERA)
             }
-        }
+        },
+        shape = RoundedCornerShape(percent = 100),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        )
+    ) {
+        Icon(
+            painterResource(id = com.practice.talkingavatar.R.drawable.ic_camera),
+            contentDescription = "Camera",
+            modifier = Modifier
+                .size(64.dp)
+                .padding(all = 18.dp)
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewCameraButton() {
+    TalkingAvatarTheme {
+        CameraButton(onClick = {})
     }
 }

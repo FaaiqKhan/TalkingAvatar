@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +25,7 @@ import androidx.media3.common.*
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.practice.talkingavatar.R
 import com.practice.talkingavatar.ui.common.*
 import com.practice.talkingavatar.utils.*
 import kotlinx.coroutines.launch
@@ -35,7 +37,7 @@ import java.util.*
 fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    viewModel: TalkingAvatarViewModel = hiltViewModel()
+    viewModel: HomeScreenViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -44,14 +46,34 @@ fun HomeScreen(
     var isCamera by remember { mutableStateOf(false) }
 
     if (isCamera) {
-        val uri = Utils.getFileUri(context = context)
-        CameraButtonView(
-            imageUri = uri,
-            onClick = {
-                isCamera = false
-                viewModel.createPresenter(it, context)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = stringResource(R.string.let_s_take_snap),
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.onPrimary,
+            )
+            Spacer(modifier = Modifier.height(28.dp))
+            Row {
+                CameraButton(
+                    onClick = {
+                        isCamera = false
+                        viewModel.createPresenter(it, context)
+                    }
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                UploadButton(
+                    onClick = {
+                        isCamera = false
+                        viewModel.createPresenter(it, context)
+                    }
+                )
             }
-        )
+
+        }
         return
     }
 
@@ -95,10 +117,11 @@ fun HomeScreen(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menu",
-                    tint = MaterialTheme.colorScheme.onPrimary,
+                    tint = MaterialTheme.colorScheme.primaryContainer,
                 )
             }
             HomeScreenContent(
+                modifier = Modifier.padding(horizontal = 20.dp),
                 screenState = uiState,
                 onClick = { isCamera = !isCamera },
                 exoPlayer = viewModel.exoPlayer,
@@ -110,6 +133,7 @@ fun HomeScreen(
 
 @Composable
 fun HomeScreenContent(
+    modifier: Modifier = Modifier,
     idleAnimation: String,
     screenState: HomeScreenUiState,
     onClick: () -> Unit,
@@ -124,15 +148,9 @@ fun HomeScreenContent(
             exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
         }
 
-        is HomeScreenUiState.Loading -> {
-            isProcessing = true
+        is HomeScreenUiState.Loading -> isProcessing = true
 
-        }
-
-        is HomeScreenUiState.Failure -> {
-            isProcessing = false
-
-        }
+        is HomeScreenUiState.Failure -> isProcessing = false
 
         is HomeScreenUiState.Success -> {
             isProcessing = false
@@ -143,7 +161,7 @@ fun HomeScreenContent(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -159,14 +177,14 @@ fun HomeScreenContent(
             ProgressIndicator()
         } else {
             Text(
-                text = "Let's create your avatar today!",
-                style = MaterialTheme.typography.displayLarge,
+                text = stringResource(R.string.let_s_create_your_avatar_today),
+                style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.onPrimary,
                 textAlign = TextAlign.Center
             )
             TalkingAvatarTextButton(
                 modifier = Modifier.fillMaxWidth(),
-                text = "Get started",
+                text = stringResource(R.string.get_started),
                 onClick = onClick,
             )
         }

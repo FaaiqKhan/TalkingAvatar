@@ -125,7 +125,7 @@ fun SettingScreenContent(
 
                 is SettingScreenUiState.Success -> {
                     Text(
-                        text = "Talk credits",
+                        text = "Talk",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
@@ -139,7 +139,7 @@ fun SettingScreenContent(
                     )
                     Spacer(modifier = Modifier.width(20.dp))
                     Text(
-                        text = "Voice credits",
+                        text = "Voice",
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
@@ -152,11 +152,7 @@ fun SettingScreenContent(
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                     Text(
-                        text = "Total voice: ${uiState.data.elevenLabCredit.voiceLimit}",
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Text(
-                        text = "Remaining voice: ${uiState.data.totalVoices}",
+                        text = "Voice count: ${uiState.data.totalVoices}",
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }

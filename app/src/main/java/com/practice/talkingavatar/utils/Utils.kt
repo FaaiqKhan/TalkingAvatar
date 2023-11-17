@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.*
 import org.json.JSONObject
 import retrofit2.HttpException
 import java.io.File
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Objects
 
@@ -52,10 +51,6 @@ class CoroutinePoller(
 
 object Utils {
 
-    fun getFileFromUri(uri: Uri, context: Context): File {
-        return Paths.get(context.dataDir.path + uri.path).toFile()
-    }
-
     fun parseDIDServiceError(exception: Exception): PresenterErrorModel {
         return if (exception is HttpException && exception.response()?.errorBody() != null) {
             val errorBody = exception.response()!!.errorBody()!!.string()
@@ -71,12 +66,6 @@ object Utils {
             )
         }
     }
-
-    fun getFileUri(context: Context): Uri = FileProvider.getUriForFile(
-        Objects.requireNonNull(context),
-        context.packageName + ".provider",
-        context.createImageFile(),
-    )
 
     fun getApplicationLogo(context: Context): String =
         if (context.packageName != "com.practice.talkingavatar.techwardsai") {
