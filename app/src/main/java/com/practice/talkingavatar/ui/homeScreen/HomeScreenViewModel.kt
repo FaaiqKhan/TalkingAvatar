@@ -12,23 +12,24 @@ import arrow.core.Either
 import com.practice.talkingavatar.R
 import com.practice.talkingavatar.model.data.PresenterImage
 import com.practice.talkingavatar.model.data.PresenterModel
+import com.practice.talkingavatar.model.database.AppDatabase
 import com.practice.talkingavatar.model.repository.DidServiceRepository
 import com.practice.talkingavatar.model.repository.S3Repository
 import com.practice.talkingavatar.ui.model.HomeScreenUiModel
-import com.practice.talkingavatar.utils.*
+import com.practice.talkingavatar.utils.CoroutinePoller
+import com.practice.talkingavatar.utils.FileUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.*
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeScreenViewModel @Inject constructor(
     private val s3Repository: S3Repository,
     private val repository: DidServiceRepository,
+    private val appDatabase: AppDatabase,
     val exoPlayer: ExoPlayer,
 ) : ViewModel() {
 

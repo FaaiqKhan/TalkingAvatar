@@ -1,12 +1,14 @@
 package com.practice.talkingavatar.model.di
 
 import android.content.Context
-import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.room.Room
 import com.amazonaws.auth.BasicAWSCredentials
 import com.amazonaws.regions.Region
 import com.amazonaws.services.s3.AmazonS3Client
 import com.practice.talkingavatar.BuildConfig
+import com.practice.talkingavatar.R
+import com.practice.talkingavatar.model.database.AppDatabase
 import com.practice.talkingavatar.model.repository.*
 import com.practice.talkingavatar.model.services.DidService
 import com.practice.talkingavatar.model.services.ElevenLabService
@@ -109,6 +111,16 @@ class TalkingAvatarNetworkModule {
         BasicAWSCredentials(BuildConfig.S3_ACCESS_KEY, BuildConfig.S3_SECRET_KEY),
         Region.getRegion(BuildConfig.S3_REGION)
     )
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase = Room
+        .databaseBuilder(
+            context, AppDatabase::class.java,
+            context.getString(R.string.talking_avatar_database)
+        )
+        .fallbackToDestructiveMigration()
+        .build()
 }
 
 @Module
